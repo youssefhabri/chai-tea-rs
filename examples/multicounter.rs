@@ -24,7 +24,7 @@ enum Msg {
     CountDir2(bool),
 }
 
-fn init() -> Model {
+fn init(_cc: &eframe::CreationContext<'_>) -> Model {
     Model {
         counter1_up: true,
         counter2_up: true,

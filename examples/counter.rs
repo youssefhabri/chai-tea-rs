@@ -21,7 +21,10 @@ impl Default for Model {
     }
 }
 
-fn init() -> Model {
+fn init(cc: &eframe::CreationContext<'_>) -> Model {
+    let ppi = cc.egui_ctx.pixels_per_point();
+    cc.egui_ctx.set_pixels_per_point(1.75 * ppi);
+
     Model::default()
 }
 

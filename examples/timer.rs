@@ -31,7 +31,7 @@ impl Default for Model {
     }
 }
 
-fn init() -> Model {
+fn init(_cc: &eframe::CreationContext<'_>) -> Model {
     Model::default()
 }
 

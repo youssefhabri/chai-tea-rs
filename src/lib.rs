@@ -216,7 +216,7 @@ pub fn run<M, Msg, Finit, Fupdate, Fview>(
 ) -> eframe::Result<()>
 where
     M: Default + 'static,
-    Finit: Fn() -> M + 'static,
+    Finit: Fn(&eframe::CreationContext<'_>) -> M + 'static,
     Fupdate: Fn(M, Msg) -> M + Copy + 'static,
     Fview: Fn(&egui::Context, &M, &mut Vec<Msg>) + Copy + 'static,
     Msg: 'static,
@@ -237,7 +237,7 @@ pub fn run_with_opts<M, Msg, Finit, Fupdate, Fview>(
 ) -> eframe::Result<()>
 where
     M: Default + 'static,
-    Finit: Fn() -> M + 'static,
+    Finit: Fn(&eframe::CreationContext<'_>) -> M + 'static,
     Fupdate: Fn(M, Msg) -> M + Copy + 'static,
     Fview: Fn(&egui::Context, &M, &mut Vec<Msg>) + Copy + 'static,
     Msg: 'static,
@@ -245,9 +245,9 @@ where
     eframe::run_native(
         title,
         options,
-        Box::new(move |_cc| {
+        Box::new(move |cc| {
             Ok(Box::new(ChaiTeaApp {
-                model: init(),
+                model: init(cc),
                 messages: Vec::new(),
                 update,
                 view,
@@ -268,7 +268,7 @@ pub fn brew_with_opts<M, Msg, Finit, Fupdate, Fview>(
 where
     M: Default + 'static,
     Msg: 'static,
-    Finit: Fn() -> M + 'static,
+    Finit: Fn(&eframe::CreationContext<'_>) -> M + 'static,
     Fupdate: Fn(M, Msg) -> M + Copy + 'static,
     Fview: Fn(&egui::Context, &M, &mut Vec<Msg>) + Copy + 'static,
 {
@@ -304,7 +304,7 @@ pub fn brew<M, Msg, Finit, Fupdate, Fview>(
 where
     M: Default + 'static,
     Msg: 'static,
-    Finit: Fn() -> M + 'static,
+    Finit: Fn(&eframe::CreationContext<'_>) -> M + 'static,
     Fupdate: Fn(M, Msg) -> M + Copy + 'static,
     Fview: Fn(&egui::Context, &M, &mut Vec<Msg>) + Copy + 'static,
 {
@@ -428,7 +428,7 @@ where
     M: Default + 'static,
     S: 'static,
     Cmd: 'static,
-    Finit: Fn() -> (M, Vec<Cmd>) + 'static,
+    Finit: Fn(&eframe::CreationContext<'_>) -> (M, Vec<Cmd>) + 'static,
     FsyncInit: Fn() -> S + 'static,
     Fupdate: Fn(M, Msg) -> (M, Vec<Cmd>) + Copy + 'static,
     Fview: Fn(&egui::Context, &M, &mut Vec<Msg>) + Copy + 'static,
@@ -453,7 +453,7 @@ where
     M: Default + 'static,
     S: 'static,
     Cmd: 'static,
-    Finit: Fn() -> (M, Vec<Cmd>) + 'static,
+    Finit: Fn(&eframe::CreationContext<'_>) -> (M, Vec<Cmd>) + 'static,
     FsyncInit: Fn() -> S + 'static,
     Fupdate: Fn(M, Msg) -> (M, Vec<Cmd>) + Copy + 'static,
     Fview: Fn(&egui::Context, &M, &mut Vec<Msg>) + Copy + 'static,
@@ -465,12 +465,12 @@ where
 
     let chai_tx = ChaiSender::new(msg_tx);
 
-    let (model, init_cmd) = init();
-
     eframe::run_native(
         title,
         options,
-        Box::new(move |_cc| {
+        Box::new(move |cc| {
+            let (model, init_cmd) = init(cc);
+
             Ok(Box::new(ChaiTeaAppAsync {
                 model,
                 sync_state: sync_state_init(),
