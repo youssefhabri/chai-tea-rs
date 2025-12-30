@@ -438,6 +438,30 @@ where
     run_async(title, init, sync_state_init, update, view, run_cmd)
 }
 
+#[inline(always)]
+pub fn brew_async_with_opts<M, S, Cmd, Msg, Finit, FsyncInit, Fupdate, Fview, Fcmd>(
+    title: &str,
+    init: Finit,
+    sync_state_init: FsyncInit,
+    update: Fupdate,
+    view: Fview,
+    run_cmd: Fcmd,
+    options: Option<eframe::NativeOptions>,
+) -> eframe::Result<()>
+where
+    M: Default + 'static,
+    S: 'static,
+    Cmd: 'static,
+    Finit: Fn(&eframe::CreationContext<'_>) -> (M, Vec<Cmd>) + 'static,
+    FsyncInit: Fn() -> S + 'static,
+    Fupdate: Fn(M, Msg) -> (M, Vec<Cmd>) + Copy + 'static,
+    Fview: Fn(&egui::Context, &M, &mut Vec<Msg>) + Copy + 'static,
+    Fcmd: Fn(Cmd, &mut S, ChaiSender<Msg>) + Copy + Send + Sync + 'static,
+    Msg: 'static,
+{
+    run_async_with_opts(title, init, sync_state_init, update, view, run_cmd, options)
+}
+
 /// Run an async chai-tea app with a model, update, view, SyncState and async run_cmd function.
 ///
 /// This is the minimal entry point. It wires up eframe and drives your Elm-style loop.
@@ -461,6 +485,32 @@ where
     Msg: 'static,
 {
     let options = eframe::NativeOptions::default();
+    run_async_with_opts(title, init, sync_state_init, update, view, run_cmd, options)
+}
+
+/// Run an async chai-tea app with a model, update, view, SyncState and async run_cmd function.
+///
+/// This is the minimal entry point. It wires up eframe and drives your Elm-style loop.
+pub fn run_async_with_opts<M, S, Cmd, Msg, Finit, FsyncInit, Fupdate, Fview, Fcmd>(
+    title: &str,
+    init: Finit,
+    sync_state_init: FsyncInit,
+    update: Fupdate,
+    view: Fview,
+    run_cmd: Fcmd,
+    options: eframe::NativeOptions,
+) -> eframe::Result<()>
+where
+    M: Default + 'static,
+    S: 'static,
+    Cmd: 'static,
+    Finit: Fn(&eframe::CreationContext<'_>) -> (M, Vec<Cmd>) + 'static,
+    FsyncInit: Fn() -> S + 'static,
+    Fupdate: Fn(M, Msg) -> (M, Vec<Cmd>) + Copy + 'static,
+    Fview: Fn(&egui::Context, &M, &mut Vec<Msg>) + Copy + 'static,
+    Fcmd: Fn(Cmd, &mut S, ChaiSender<Msg>) + Copy + Send + Sync + 'static,
+    Msg: 'static,
+{
     let (msg_tx, msg_rx) = std::sync::mpsc::channel();
 
     let chai_tx = ChaiSender::new(msg_tx);
