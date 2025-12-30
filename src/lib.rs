@@ -446,7 +446,7 @@ pub fn brew_async_with_opts<M, S, Cmd, Msg, Finit, FsyncInit, Fupdate, Fview, Fc
     update: Fupdate,
     view: Fview,
     run_cmd: Fcmd,
-    options: Option<eframe::NativeOptions>,
+    options: eframe::NativeOptions,
 ) -> eframe::Result<()>
 where
     M: Default + 'static,
